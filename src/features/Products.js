@@ -10,7 +10,8 @@ import {
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {addItemToCart} from '../redux/slice/CartSlice';
+import {addItemToCart, deleteMyCartItem, removeItemToCart} from '../redux/slice/CartSlice';
+import { decreaseQty, increaseQty } from '../redux/slice/ProductSlice';
 
 const Products = ({navigation}) => {
   const MyProducts = useSelector(state => state.product);
@@ -83,6 +84,7 @@ const Products = ({navigation}) => {
             <TouchableOpacity
               onPress={() => {
                 dispatch(addItemToCart(item));
+                dispatch(increaseQty(item.id))
               }}
               activeOpacity={0.8}
               style={[styles.addcartBtn, {backgroundColor: 'green'}]}
@@ -95,13 +97,24 @@ const Products = ({navigation}) => {
           ) : null}
           {item?.qty !== 0 ? (
             <View style={styles.addcartBtn}>
-              <TouchableOpacity activeOpacity={0.8} style={styles.counterBtn}>
+              <TouchableOpacity activeOpacity={0.8} style={styles.counterBtn} onPress={() => {
+                if (item.qty > 1) {
+                  dispatch(removeItemToCart(item));
+                  dispatch(decreaseQty(item.id));
+                } else {
+                  dispatch(deleteMyCartItem(item));
+                  dispatch(decreaseQty(item.id));
+                }
+              }}>
                 <Text style={{fontWeight: '600', fontSize: 20, color: 'white'}}>
                   -
                 </Text>
               </TouchableOpacity>
               <Text style={{fontWeight: '600', fontSize: 20}}>{item?.qty}</Text>
-              <TouchableOpacity activeOpacity={0.8} style={styles.counterBtn}>
+              <TouchableOpacity activeOpacity={0.8} style={styles.counterBtn} onPress={() => {
+                dispatch(addItemToCart(item));
+                dispatch(increaseQty(item.id));
+              }}>
                 <Text style={{fontWeight: '600', fontSize: 20, color: 'white'}}>
                   +
                 </Text>
